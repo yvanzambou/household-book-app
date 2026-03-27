@@ -1,5 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
 import axios from "axios";
+
+import Register from "./pages/Register";
+import AddTransaction from "./pages/AddTransaction";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
 
 const api = axios.create({
   baseURL: "http://localhost:4000/api"
@@ -7,46 +13,54 @@ const api = axios.create({
 
 function App() {
   const [token, setToken] = useState(null);
-  const [transactions, setTransactions] = useState([]);
 
-  async function login() {
-    const res = await api.post("/auth/login", {
-      email: "test@example.com",
-      password: "password"
-    });
-    setToken(res.data.token);
+  function logout() {
+    setToken(null);
   }
-
-  async function loadTransactions() {
-    const res = await api.get("/transactions", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setTransactions(res.data);
-  }
-
-  useEffect(() => {
-    if (token) {
-      loadTransactions();
-    }
-  }, [token]);
 
   return (
-    <div>
-      <h1>Household Book</h1>
-      {!token && <button onClick={login}>Login (Demo)</button>}
-      {token && (
-        <>
-          <h2>Transactions</h2>
-          <ul>
-            {transactions.map(t => (
-              <li key={t.id}>
-                {t.type} - {t.amount} - {t.category}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-    </div>
+    <BrowserRouter>
+      <nav className="bg-gray-800 text-white p-4 flex justify-between">
+        <Link to="/" className="font-bold text-xl">Household Book</Link>
+
+        <div className="space-x-4">
+          {!token && (
+            <>
+              <Link to="/login" className="hover:underline">Login</Link>
+              <Link to="/register" className="hover:underline">Register</Link>
+            </>
+          )}
+
+          {token && (
+            <>
+              <Link to="/add" className="hover:underline">Add Transaction</Link>
+              <button
+                onClick={logout}
+                className="bg-red-600 px-3 py-1 rounded hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </>
+          )}
+        </div>
+      </nav>
+
+      <Routes>
+        <Route
+          path="/"
+          element={
+            token ? <Dashboard token={token} /> : <Navigate to="/login" />
+          }
+        />
+
+        <Route path="/add" element={<AddTransaction token={token} />} />
+        <Route path="/dashboard" element={<Dashboard token={token} />} />
+        <Route path="/login" element={<Login setToken={setToken} />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
