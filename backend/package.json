@@ -10,15 +10,15 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "cors": "^2.8.5",
-    "jsonwebtoken": "^9.0.2",
-    "pg": "^8.13.1",
-    "pg-pool": "^3.6.2"
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "cors": "^2.8.6",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.20.0",
+    "pg-pool": "^3.13.0"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
-    "supertest": "^7.0.0"
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2"
   }
 }
