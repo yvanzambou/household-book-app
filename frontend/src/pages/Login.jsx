@@ -1,93 +1,59 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { request } from "../api";
+import { useAuth } from "../auth";
+import AuthLayout from "../components/AuthLayout";
 
-export default function Login({ setToken }) {
+export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
+    setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Login fehlgeschlagen");
-        return;
-      }
-
-      setToken(data.token);
+      const data = await request("/auth/login", { method: "POST", body: form });
+      login(data.token, data.user);
       navigate("/");
     } catch (err) {
-      setError("Serverfehler. Bitte später erneut versuchen.");
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">
-          Login
-        </h2>
+    <AuthLayout title="Willkommen zurück" subtitle="Melde dich an, um dein Haushaltsbuch zu öffnen.">
+      {error && <div className="alert-error mb-4">{error}</div>}
 
-        {error && (
-          <p className="bg-red-600 text-white p-2 rounded mb-4 text-center">
-            {error}
-          </p>
-        )}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="label" htmlFor="email">E-Mail</label>
+          <input id="email" type="email" name="email" value={form.email}
+            onChange={handleChange} required autoComplete="email" className="input" />
+        </div>
+        <div>
+          <label className="label" htmlFor="password">Passwort</label>
+          <input id="password" type="password" name="password" value={form.password}
+            onChange={handleChange} required autoComplete="current-password" className="input" />
+        </div>
+        <button type="submit" disabled={loading} className="btn-primary w-full">
+          {loading ? "Wird angemeldet …" : "Anmelden"}
+        </button>
+      </form>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-gray-300">E-Mail</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full p-2 rounded bg-gray-700 text-white mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="text-gray-300">Passwort</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="w-full p-2 rounded bg-gray-700 text-white mt-1"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded font-semibold"
-          >
-            Login
-          </button>
-        </form>
-
-        <p className="text-gray-400 text-center mt-4">
-          Noch kein Konto?{" "}
-          <Link to="/register" className="text-blue-400 hover:underline">
-            Registrieren
-          </Link>
-        </p>
-      </div>
-    </div>
+      <p className="mt-6 text-center text-sm text-slate-400">
+        Noch kein Konto?{" "}
+        <Link to="/register" className="font-medium text-emerald-400 hover:underline">
+          Jetzt registrieren
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }

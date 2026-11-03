@@ -1,18 +1,17 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { request } from "../api";
+import AuthLayout from "../components/AuthLayout";
+
+const EMPTY = { name: "", email: "", password: "", confirmPassword: "" };
 
 export default function Register() {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
+  const [form, setForm] = useState(EMPTY);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,105 +19,70 @@ export default function Register() {
     setSuccess("");
 
     if (form.password !== form.confirmPassword) {
-      setError("Passwörter stimmen nicht überein");
+      setError("Die Passwörter stimmen nicht überein.");
       return;
     }
 
+    setLoading(true);
     try {
-      const res = await fetch("http://localhost:4000/api/auth/register", {
+      await request("/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password,
-        }),
+        body: { name: form.name, email: form.email, password: form.password },
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Registrierung fehlgeschlagen");
-        return;
-      }
-
-      setSuccess("Registrierung erfolgreich! Du kannst dich jetzt einloggen.");
-      setForm({ email: "", password: "", confirmPassword: "" });
+      setSuccess("Registrierung erfolgreich! Du kannst dich jetzt anmelden.");
+      setForm(EMPTY);
     } catch (err) {
-      setError("Serverfehler. Bitte später erneut versuchen.");
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">
-          Registrieren
-        </h2>
+    <AuthLayout title="Konto erstellen" subtitle="Starte jetzt mit deinem eigenen Haushaltsbuch.">
+      {error && <div className="alert-error mb-4">{error}</div>}
+      {success && (
+        <div className="alert-success mb-4">
+          {success}{" "}
+          <Link to="/login" className="font-semibold underline">Zur Anmeldung</Link>
+        </div>
+      )}
 
-        {error && (
-          <p className="bg-red-600 text-white p-2 rounded mb-4 text-center">
-            {error}
-          </p>
-        )}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="label" htmlFor="name">Name</label>
+          <input id="name" type="text" name="name" value={form.name} onChange={handleChange}
+            required maxLength={100} autoComplete="name" placeholder="Dein Vorname"
+            className="input" />
+        </div>
+        <div>
+          <label className="label" htmlFor="email">E-Mail</label>
+          <input id="email" type="email" name="email" value={form.email}
+            onChange={handleChange} required autoComplete="email" className="input" />
+        </div>
+        <div>
+          <label className="label" htmlFor="password">Passwort</label>
+          <input id="password" type="password" name="password" value={form.password}
+            onChange={handleChange} required minLength={6} autoComplete="new-password"
+            placeholder="Mindestens 6 Zeichen" className="input" />
+        </div>
+        <div>
+          <label className="label" htmlFor="confirmPassword">Passwort bestätigen</label>
+          <input id="confirmPassword" type="password" name="confirmPassword"
+            value={form.confirmPassword} onChange={handleChange} required
+            autoComplete="new-password" className="input" />
+        </div>
+        <button type="submit" disabled={loading} className="btn-primary w-full">
+          {loading ? "Wird registriert …" : "Registrieren"}
+        </button>
+      </form>
 
-        {success && (
-          <p className="bg-green-600 text-white p-2 rounded mb-4 text-center">
-            {success}
-          </p>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="text-gray-300">E-Mail</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full p-2 rounded bg-gray-700 text-white mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="text-gray-300">Passwort</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              required
-              className="w-full p-2 rounded bg-gray-700 text-white mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="text-gray-300">Passwort bestätigen</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              required
-              className="w-full p-2 rounded bg-gray-700 text-white mt-1"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded font-semibold"
-          >
-            Registrieren
-          </button>
-        </form>
-
-        <p className="text-gray-400 text-center mt-4">
-          Bereits ein Konto?{" "}
-          <a href="/login" className="text-blue-400 hover:underline">
-            Jetzt einloggen
-          </a>
-        </p>
-      </div>
-    </div>
+      <p className="mt-6 text-center text-sm text-slate-400">
+        Bereits ein Konto?{" "}
+        <Link to="/login" className="font-medium text-emerald-400 hover:underline">
+          Jetzt anmelden
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }

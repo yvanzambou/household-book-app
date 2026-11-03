@@ -1,67 +1,27 @@
-import { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, Link } from "react-router-dom";
-import axios from "axios";
-
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./auth";
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/Register";
 import AddTransaction from "./pages/AddTransaction";
+import EditTransaction from "./pages/EditTransaction";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 
-const api = axios.create({
-  baseURL: "http://localhost:4000/api"
-});
-
-function App() {
-  const [token, setToken] = useState(null);
-
-  function logout() {
-    setToken(null);
-  }
-
+export default function App() {
   return (
-    <BrowserRouter>
-      <nav className="bg-gray-800 text-white p-4 flex justify-between">
-        <Link to="/" className="font-bold text-xl">Household Book</Link>
-
-        <div className="space-x-4">
-          {!token && (
-            <>
-              <Link to="/login" className="hover:underline">Login</Link>
-              <Link to="/register" className="hover:underline">Register</Link>
-            </>
-          )}
-
-          {token && (
-            <>
-              <Link to="/add" className="hover:underline">Add Transaction</Link>
-              <button
-                onClick={logout}
-                className="bg-red-600 px-3 py-1 rounded hover:bg-red-700"
-              >
-                Logout
-              </button>
-            </>
-          )}
-        </div>
-      </nav>
-
-      <Routes>
-        <Route
-          path="/"
-          element={
-            token ? <Dashboard token={token} /> : <Navigate to="/login" />
-          }
-        />
-
-        <Route path="/add" element={<AddTransaction token={token} />} />
-        <Route path="/dashboard" element={<Dashboard token={token} />} />
-        <Route path="/login" element={<Login setToken={setToken} />} />
-        <Route path="/register" element={<Register />} />
-
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/add" element={<ProtectedRoute><AddTransaction /></ProtectedRoute>} />
+          <Route path="/edit/:id" element={<ProtectedRoute><EditTransaction /></ProtectedRoute>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
-
-export default App;
