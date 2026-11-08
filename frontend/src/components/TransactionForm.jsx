@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { fromLocalInput } from "../format";
+import { fromLocalDateTimeInput } from "../format";
 
 const MAX_NOTE = 500;
 
@@ -17,7 +17,7 @@ export default function TransactionForm({ initial, submitLabel, loadingLabel, on
       amount: Number(form.amount.replace(",", ".")),
       category: form.category,
       note: form.note,
-      date: fromLocalInput(form.date),
+      date: fromLocalDateTimeInput(form.date),
     });
   };
 

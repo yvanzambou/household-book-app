@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { request } from "../api";
 import { useAuth } from "../auth";
-import { toLocalInput } from "../format";
+import { toLocalDateTimeInput } from "../format";
 import TransactionForm from "../components/TransactionForm";
 
 export default function AddTransaction() {
@@ -29,7 +29,7 @@ export default function AddTransaction() {
       <div className="card !p-8">
         <h1 className="mb-6 text-2xl font-bold text-slate-100">Neue Buchung</h1>
         <TransactionForm
-          initial={{ type: "expense", amount: "", category: "", note: "", date: toLocalInput() }}
+          initial={{ type: "expense", amount: "", category: "", note: "", date: toLocalDateTimeInput() }}
           submitLabel="Speichern"
           loadingLabel="Speichert …"
           onSubmit={handleSubmit}

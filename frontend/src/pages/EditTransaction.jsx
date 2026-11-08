@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { request } from "../api";
 import { useAuth } from "../auth";
-import { toLocalInput } from "../format";
+import { toLocalDateTimeInput } from "../format";
 import TransactionForm from "../components/TransactionForm";
 
 export default function EditTransaction() {
@@ -60,7 +60,7 @@ export default function EditTransaction() {
               amount: String(tx.amount).replace(".", ","),
               category: tx.category,
               note: tx.note,
-              date: toLocalInput(tx.date),
+              date: toLocalDateTimeInput(tx.date),
             }}
             submitLabel="Speichern"
             loadingLabel="Speichert …"

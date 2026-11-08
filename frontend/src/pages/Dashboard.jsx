@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { request } from "../api";
 import { useAuth } from "../auth";
-import { euro, datumZeit, TYP } from "../format";
+import { formatCurrency, formatDateTime, TYP } from "../format";
 import BalanceChart from "../components/BalanceChart";
 import { TrashIcon, PencilIcon, ChevronIcon } from "../components/icons";
 
@@ -54,10 +54,10 @@ function TransactionItem({ t, open, onToggle, onDelete }) {
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate font-medium text-slate-100">{t.category}</span>
-            <span className="block text-xs text-slate-400">{TYP[t.type]} · {datumZeit(t.date)}</span>
+            <span className="block text-xs text-slate-400">{TYP[t.type]} · {formatDateTime(t.date)}</span>
           </span>
           <span className={`font-semibold whitespace-nowrap ${income ? "text-emerald-400" : "text-rose-400"}`}>
-            {income ? "+" : "−"}{euro(t.amount)}
+            {income ? "+" : "−"}{formatCurrency(t.amount)}
           </span>
           <ChevronIcon className={`h-5 w-5 shrink-0 text-slate-500 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
         </button>
@@ -156,9 +156,9 @@ export default function Dashboard() {
       {error && <div className="alert-error">{error}</div>}
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Stat label="Einnahmen" value={euro(income)} tone="green" />
-        <Stat label="Ausgaben" value={euro(expenses)} tone="red" />
-        <Stat label="Saldo" value={euro(saldo)} tone={saldo >= 0 ? "green" : "red"} />
+        <Stat label="Einnahmen" value={formatCurrency(income)} tone="green" />
+        <Stat label="Ausgaben" value={formatCurrency(expenses)} tone="red" />
+        <Stat label="Saldo" value={formatCurrency(saldo)} tone={saldo >= 0 ? "green" : "red"} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-5">

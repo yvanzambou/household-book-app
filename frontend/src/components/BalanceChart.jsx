@@ -1,6 +1,6 @@
 import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { euro } from "../format";
+import { formatCurrency } from "../format";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 ChartJS.defaults.color = "#94a3b8";
@@ -69,11 +69,11 @@ export default function BalanceChart({ income, expenses }) {
         callbacks: {
           label: (ctx) => {
             const pct = ((ctx.parsed / total) * 100).toFixed(1).replace(".", ",");
-            return ` ${ctx.label}: ${euro(ctx.parsed)} (${pct} %)`;
+            return ` ${ctx.label}: ${formatCurrency(ctx.parsed)} (${pct} %)`;
           },
         },
       },
-      centerText: { text: euro(saldo), color: saldo >= 0 ? "#34d399" : "#fb7185" },
+      centerText: { text: formatCurrency(saldo), color: saldo >= 0 ? "#34d399" : "#fb7185" },
     },
   };
 

@@ -13,14 +13,14 @@ export async function initDatabase() {
     const schemaPath = path.resolve("src/db/schema.sql");
     const schema = fs.readFileSync(schemaPath, "utf8");
 
-    console.log("⏳ Initializing database...");
+    console.log("⏳ INITIALISIERUNG DER DATANBANK...");
 
     const client = await pool.connect(); // <‑‑ wichtig!
     await client.query(schema);
     client.release();
 
-    console.log("✅ Database initialized");
+    console.log("✅ DATENBANK INITIALISIERT");
   } catch (err) {
-    console.error("❌ Database initialization failed:", err);
+    console.error("❌ INITIALISIERUNG DER DATANBANK FEHLGESCHLAGEN:", err);
   }
 }
