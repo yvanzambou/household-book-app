@@ -1,11 +1,13 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/Node.js-20-339933?logo=nodedotjs" />
+ <p align="center">
+  <img src="https://img.shields.io/badge/Node.js-22-339933?logo=nodedotjs" />
   <img src="https://img.shields.io/badge/Express-5-000000?logo=express" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" />
   <img src="https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?logo=javascript" />
   <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss" />
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker" />
+  <img src="https://img.shields.io/badge/Tests-Vitest-6E9F18?logo=vitest" />
+  <img src="https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions" />
 </p>
 
 # 💶 Haushaltsbuch – Finanzverwaltung
@@ -27,6 +29,8 @@ Das Frontend basiert auf React und kommuniziert über eine REST-API mit einem No
 - 🍩 **Diagramm:** Grafische Gegenüberstellung von Einnahmen und Ausgaben
 - 💾 **Persistente Speicherung:** Benutzer und Buchungen werden in PostgreSQL gespeichert
 - 🔌 **REST-API:** Kommunikation zwischen React-Frontend und Express-Backend
+- 🧪 **Automatisierte Tests:** Unit- und Komponententests mit Vitest und React Testing Library
+- 🔄 **Continuous Integration:** Automatische Ausführung der Frontend-Tests mit GitHub Actions
 - 🐳 **Docker Compose:** Frontend, Backend und Datenbank gemeinsam starten
 
 ---
@@ -35,7 +39,7 @@ Das Frontend basiert auf React und kommuniziert über eine REST-API mit einem No
 
 | Bereich | Technologie |
 |---|---|
-| Backend | Node.js 20, Express 5 |
+| Backend | Node.js 22, Express 5 |
 | Schnittstelle | REST API |
 | Authentifizierung | JSON Web Token (JWT), bcryptjs |
 | Frontend | React 19, JavaScript, Vite |
@@ -46,7 +50,9 @@ Das Frontend basiert auf React und kommuniziert über eine REST-API mit einem No
 | Datenbank | PostgreSQL 16 |
 | Datenbankzugriff | node-postgres (`pg`) |
 | Containerisierung | Docker, Docker Compose |
-| CI | GitHub Actions (Lint, Build, Syntax- und Schema-Prüfung, Docker-Build) |
+| Testframework | Vitest |
+| Komponententests | React Testing Library, user-event |
+| CI | GitHub Actions |
 
 ---
 
@@ -62,7 +68,7 @@ Das Frontend basiert auf React und kommuniziert über eine REST-API mit einem No
 1. **Repository klonen**
 
    ```bash
-   git clone https://github.com/yvanzambou/booki-booki-online-bookshop.git
+   git clone https://github.com/yvanzambou/household-book-app.git
    cd household-book-app
    ```
 
@@ -173,7 +179,7 @@ Die PostgreSQL-Datenbank ist lokal über Port `5432` erreichbar. Die Zugangsdate
 Um eine PostgreSQL-Shell im laufenden Datenbank-Container zu öffnen:
 
 ```bash
-   docker compose exec db psql -U admin -d household
+docker compose exec db psql -U admin -d household
 ```
 
 Nützliche SQL-Befehle:
@@ -215,15 +221,48 @@ PostgreSQL-Datenbank
 
 ---
 
+## 🧪 Automatisierte Tests
+
+Für die Qualitätssicherung werden automatisierte Tests mit Vitest eingesetzt.
+
+### Frontend
+
+- **Vitest:** Ausführung der Unit-Tests
+- **React Testing Library:** Testen von React-Komponenten
+- **user-event:** Simulation von Benutzerinteraktionen
+- **jest-dom:** Zusätzliche Assertions für DOM-Elemente
+
+Die Tests überprüfen unter anderem die Formatierung von Währungsbeträgen und Datumswerten sowie die Funktionalität der Buchungsformulare.
+
+### Tests lokal ausführen
+
+Im Frontend-Verzeichnis:
+
+```bash
+npm run test -- --run
+```
+
+---
+
 ## 🔄 Continuous Integration
 
-GitHub Actions führt bei Pushes auf den Branch `main` sowie bei Pull Requests automatisierte Prüfungen aus.
+GitHub Actions übernimmt die automatische Ausführung der Frontend-Tests.
 
-Der Workflow umfasst:
+Der CI-Workflow wird bei folgenden Ereignissen gestartet:
 
-- **Frontend:** Installation der Abhängigkeiten, ESLint-Prüfung und Produktions-Build
-- **Backend:** Installation der Abhängigkeiten, JavaScript-Syntaxprüfung und wiederholte Anwendung des Datenbankschemas auf PostgreSQL
-- **Docker:** Build der Frontend- und Backend-Images nach erfolgreichem Abschluss der vorherigen Jobs
+- Push auf den Branch `main` oder `master`
+- Pull Requests gegen `main` oder `master`
+
+### Ablauf der Pipeline
+
+1. **Repository auschecken:** GitHub lädt den aktuellen Quellcode.
+2. **Node.js einrichten:** Die benötigte Node.js-Version wird bereitgestellt.
+3. **Abhängigkeiten installieren:** `npm ci` installiert die Pakete anhand der `package-lock.json`.
+4. **Tests ausführen:** Vitest startet die automatisierten Unit- und Komponententests.
+
+Die Pipeline verwendet `Europe/Berlin` als Zeitzone, damit Datums- und Uhrzeittests unabhängig von der standardmäßigen UTC-Zeitzone des GitHub-Runners mit der lokalen deutschen Zeitzone ausgeführt werden.
+
+Der Status der Testausführung kann im GitHub-Repository unter **Actions** eingesehen werden.
 
 ---
 
@@ -232,7 +271,7 @@ Der Workflow umfasst:
 Die Container stoppen, ohne das persistente Datenbank-Volume zu löschen:
 
 ```bash
-   docker compose down
+docker compose down
 ```
 
 **Achtung:** `docker compose down --volumes` löscht auch das persistente Datenbank-Volume `db_data` und damit die darin gespeicherten Daten. Verwende diesen Befehl nur, wenn du die Daten bewusst entfernen möchtest.
@@ -241,7 +280,7 @@ Die Container stoppen, ohne das persistente Datenbank-Volume zu löschen:
 
 ## 💡 Mögliche Erweiterungen
 
-- 🧪 Automatisierte Frontend- und Backend-Tests
+- 🧪 Erweiterung der automatisierten Tests um Backend-Unit- und Integrationstests
 - 🔎 Filterung und Sortierung der Buchungen nach Zeitraum, Kategorie und Typ
 - 📅 Monats- und Jahresauswertungen
 - 🎯 Budgets und Ausgabenlimits pro Kategorie
@@ -253,7 +292,7 @@ Die Container stoppen, ohne das persistente Datenbank-Volume zu löschen:
 
 ## 📄 Hinweis
 
-Das Haushaltsbuch ist ein Portfolio-Projekt zur praktischen Anwendung von Konzepten der Full-Stack-Webentwicklung. Es verbindet ein React-Frontend mit einer REST-API auf Basis von Node.js und Express sowie einer PostgreSQL-Datenbank. Die Anwendung demonstriert unter anderem Benutzerregistrierung, JWT-basierte Authentifizierung, CRUD-Operationen und die Containerisierung mit Docker Compose.
+Das Haushaltsbuch ist ein Portfolio-Projekt zur praktischen Anwendung von Konzepten der Full-Stack-Webentwicklung. Es verbindet ein React-Frontend mit einer REST-API auf Basis von Node.js und Express sowie einer PostgreSQL-Datenbank. Die Anwendung demonstriert unter anderem Benutzerregistrierung, JWT-basierte Authentifizierung, CRUD-Operationen, automatisierte Tests, Continuous Integration und Containerisierung mit Docker Compose.
 
 ---
 
