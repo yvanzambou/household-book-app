@@ -11,6 +11,9 @@ jobs:
     name: Frontend Tests
     runs-on: ubuntu-latest
 
+    env:
+      TZ: Europe/Berlin
+
     defaults:
       run:
         working-directory: frontend
